@@ -13,10 +13,17 @@
         <property name="show_sql">true</property>
         <property name="hbm2ddl.auto">create</property>
         
+        <!--
         <mapping class="hibernate.Event"/>
+        
         <mapping class="hibernate.Trainee"/>
         <mapping class="hibernate.Course"/>
         <mapping class="hibernate.Evaluation"/>
+        -->
+        
+        <mapping class="minitema2.Article"/>
+        <mapping class="minitema2.Store"/>
+        <mapping class="minitema2.Price"/>
 
         <!-- mapping resource="com/ssn/databaseobjects.xml"/-->
 

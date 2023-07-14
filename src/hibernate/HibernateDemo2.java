@@ -3,9 +3,10 @@ package hibernate;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -16,20 +17,54 @@ public class HibernateDemo2 {
 		demo.run();
 	}
 
-	private EntityManagerFactory sessionFactory;
+	private SessionFactory sessionFactory;
 
 	private void run() throws Exception {
 		setUp();
 		saveEntities();
+		updateEntity();
+		deleteEntity();
 		queryEntities();
 		queryOneEntity();
+	}
+
+	private void deleteEntity() {
+		Session session = sessionFactory.openSession();
+
+		session.getTransaction().begin();
+
+		TypedQuery<Course> query = session.createQuery("from Course where name = :nameParameter", Course.class);
+		query.setParameter("nameParameter", "Sport");
+
+		Course result = query.getSingleResult();
+		session.delete(result);
+
+		session.getTransaction().commit();
+		session.close();
+
+	}
+
+	private void updateEntity() {
+		EntityManager entityManager = sessionFactory.createEntityManager();
+
+		entityManager.getTransaction().begin();
+
+		TypedQuery<Course> query = entityManager.createQuery("from Course where name = :nameParameter", Course.class);
+		query.setParameter("nameParameter", "Romana");
+
+		Course result = query.getSingleResult();
+		result.setName("Limba Romana");
+
+		entityManager.getTransaction().commit();
+		entityManager.close();
+
 	}
 
 	private void queryOneEntity() {
 		EntityManager entityManager = sessionFactory.createEntityManager();
 
 		TypedQuery<Course> query = entityManager.createQuery("from Course where name = :nameParameter", Course.class);
-		query.setParameter("nameParameter", "Romana");
+		query.setParameter("nameParameter", "Matematica");
 
 		Course result = query.getSingleResult();
 
@@ -64,6 +99,8 @@ public class HibernateDemo2 {
 		entityManager.persist(course1);
 		Course course2 = new Course("Matematica");
 		entityManager.persist(course2);
+		Course course3 = new Course("Sport");
+		entityManager.persist(course3);
 
 		trainee1.getCourses().add(course2);
 		trainee2.getCourses().add(course1);
