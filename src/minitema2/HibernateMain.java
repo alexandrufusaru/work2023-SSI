@@ -77,10 +77,10 @@ public class HibernateMain {
 
 	private void addPrice() {
 		Scanner scan = new Scanner(System.in);
-		System.out.println("ID articol: ");
-		int idA = scan.nextInt();
-		System.out.println("ID magazin: ");
-		int idS = scan.nextInt();
+		System.out.println("Nume articol: ");
+		String idA = scan.nextLine();
+		System.out.println("Nume magazin: ");
+		String idS = scan.nextLine();
 		System.out.println("Pret: ");
 		int pr = scan.nextInt();
 

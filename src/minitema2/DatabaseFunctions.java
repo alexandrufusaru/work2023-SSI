@@ -37,20 +37,20 @@ public class DatabaseFunctions {
 
 	}
 
-	public void savePrice(int idA, int idS, int price) {
+	public void savePrice(String idA, String idS, int price) {
 
 		new WithSessionAndTransaction() {
 			@Override
 			public void doAction(Session session) {
 
-				Article article = getArticleById(idA, session);
+				Article article = getArticleByName(idA, session);
 				if (article == null) {
-					throw new RuntimeException("Articol inexistent: id=" + idA);
+					throw new RuntimeException("Articol inexistent: " + idA);
 				}
 
 				Store store = getStoreByName(idS, session);
 				if (store == null) {
-					throw new RuntimeException("Magazin inexistent: id=" + idS);
+					throw new RuntimeException("Magazin inexistent: " + idS);
 				}
 
 				Price pricee = new Price(price, article, store);
@@ -107,17 +107,61 @@ public class DatabaseFunctions {
 		}.run();
 	}
 
-	private Store getStoreByName(int idS, Session session) {
-		Query<Store> query2 = session.createQuery("from Store where id = :nameParameter", Store.class);
+	private Store getStoreByName(String idS, Session session) {
+		Query<Store> query2 = session.createQuery("from Store where name = :nameParameter", Store.class);
 		query2.setParameter("nameParameter", idS);
-		Store store = query2.getSingleResult();
+		Store store = query2.uniqueResult();
 		return store;
 	}
 
-	private Article getArticleById(int idA, Session session) {
-		Query<Article> query = session.createQuery("from Article where id = :nameParameter", Article.class);
+	private Article getArticleByName(String idA, Session session) {
+		Query<Article> query = session.createQuery("from Article where name = :nameParameter", Article.class);
 		query.setParameter("nameParameter", idA);
-		Article article = query.getSingleResult();
+		Article article = query.uniqueResult();
 		return article;
+	}
+
+	private List<Article> getArticles(Session session) {
+		Query<Article> query = session.createQuery("from Article", Article.class);
+		return query.list();
+	}
+
+	public List<Article> getAllArticles() {
+		return new WithSessionAndTransaction<List<Article>>() {
+			@Override
+			public void doAction(Session session) {
+				setReturnValue(getArticles(session));
+			}
+		}.run();
+	}
+
+	private List<Store> getStores(Session session) {
+		Query<Store> query2 = session.createQuery("from Store", Store.class);
+		return query2.list();
+	}
+
+	public List<Store> getAllStores() {
+		return new WithSessionAndTransaction<List<Store>>() {
+			@Override
+			public void doAction(Session session) {
+
+				setReturnValue(getStores(session));
+
+			}
+		}.run();
+	}
+
+	private List<Price> getPrices(Session session) {
+		Query<Price> query2 = session.createQuery("from Price", Price.class);
+		return query2.list();
+	}
+
+	public List<Price> getAllPrices() {
+		return new WithSessionAndTransaction<List<Price>>() {
+			@Override
+			public void doAction(Session session) {
+				setReturnValue(getPrices(session));
+			}
+		}.run();
 	}
 }
