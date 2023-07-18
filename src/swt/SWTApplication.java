@@ -34,7 +34,7 @@ public class SWTApplication {
 
 		MenuItem item = new MenuItem(submenu, SWT.PUSH);
 		item.addListener(SWT.Selection, e -> {
-			new ArcticlesDialog(display).open();
+			new ArticlesDialog(display).open();
 		});
 		item.setText("Articles");
 		shell.setSize(200, 200);

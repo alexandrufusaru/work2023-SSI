@@ -17,15 +17,15 @@ import org.eclipse.swt.widgets.TableItem;
 import minitema2.DatabaseFunctions;
 import minitema2.Price;
 
-public class PricesDialog {
+public class SortPricesDialog {
 	private Display display;
 
-	public PricesDialog(Display display) {
+	public SortPricesDialog(Display display) {
 		super();
 		this.display = display;
 	}
 
-	public void run() {
+	public void open() {
 		Shell shell = new Shell(display);
 		shell.setText("Prices");
 		shell.setLayout(new GridLayout());
@@ -36,21 +36,22 @@ public class PricesDialog {
 		table.setHeaderVisible(true);
 
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-		data.heightHint = 200;
+		data.heightHint = 50;
 		table.setLayoutData(data);
 
-		String[] titles = { "Article", "Store", "Value" };
+		String[] titles = { "Name Article", "Name Store", "Value" };
 		for (String title : titles) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setText(title);
 		}
 
 		DatabaseFunctions df = new DatabaseFunctions();
-		List<Price> prices = df.getAllPrices();
+		List<Price> prices = df.getSortedPrices();
+
 		for (Price p : prices) {
 			TableItem item = new TableItem(table, SWT.NONE);
 			item.setText(0, p.getArticle().getName());
-			item.setText(1, p.getStore().getName());
+			item.setText(1, Integer.toString(p.getStore().getId()));
 			item.setText(2, Integer.toString(p.getPrice()));
 		}
 
@@ -69,11 +70,11 @@ public class PricesDialog {
 
 		Button delbtn = new Button(shell, SWT.PUSH);
 		delbtn.setText("Delete");
-		delbtn.addSelectionListener(widgetSelectedAdapter(e -> new DeletePriceDialog(display).run()));
+		delbtn.addSelectionListener(widgetSelectedAdapter(e -> System.out.println("Delete")));
 
 		Button refreshbtn = new Button(shell, SWT.PUSH);
 		refreshbtn.setText("Refresh");
-		refreshbtn.addSelectionListener(widgetSelectedAdapter(e -> new PricesDialog(display).run()));
+		refreshbtn.addSelectionListener(widgetSelectedAdapter(e -> new SortPricesDialog(display).open()));
 		refreshbtn.addSelectionListener(widgetSelectedAdapter(e -> shell.close()));
 
 		shell.pack();
@@ -83,4 +84,5 @@ public class PricesDialog {
 		 * display.sleep(); } display.dispose();
 		 */
 	}
+
 }

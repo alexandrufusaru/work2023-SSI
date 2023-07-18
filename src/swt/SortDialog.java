@@ -14,20 +14,23 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import minitema2.Article;
 import minitema2.DatabaseFunctions;
-import minitema2.Price;
+import minitema2.Store;
 
-public class PricesDialog {
+public class SortDialog {
 	private Display display;
+	private String mesaj;
 
-	public PricesDialog(Display display) {
+	public SortDialog(Display display, String mesaj) {
 		super();
 		this.display = display;
+		this.mesaj = mesaj;
 	}
 
-	public void run() {
+	public void open() {
 		Shell shell = new Shell(display);
-		shell.setText("Prices");
+		shell.setText(mesaj);
 		shell.setLayout(new GridLayout());
 		shell.setMinimumSize(400, 400);
 
@@ -36,22 +39,33 @@ public class PricesDialog {
 		table.setHeaderVisible(true);
 
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-		data.heightHint = 200;
+		data.heightHint = 50;
 		table.setLayoutData(data);
 
-		String[] titles = { "Article", "Store", "Value" };
+		String[] titles = { "Name" };
 		for (String title : titles) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setText(title);
 		}
 
 		DatabaseFunctions df = new DatabaseFunctions();
-		List<Price> prices = df.getAllPrices();
-		for (Price p : prices) {
-			TableItem item = new TableItem(table, SWT.NONE);
-			item.setText(0, p.getArticle().getName());
-			item.setText(1, p.getStore().getName());
-			item.setText(2, Integer.toString(p.getPrice()));
+
+		switch (mesaj) {
+		case "article":
+			List<Article> articles = df.getSortedArticles();
+
+			for (Article a : articles) {
+				TableItem item = new TableItem(table, SWT.NONE);
+				item.setText(0, a.getName());
+			}
+			break;
+		case "store":
+			List<Store> stores = df.getSortedStores();
+
+			for (Store a : stores) {
+				TableItem item = new TableItem(table, SWT.NONE);
+				item.setText(0, a.getName());
+			}
 		}
 
 		for (int i = 0; i < titles.length; i++) {
@@ -60,20 +74,20 @@ public class PricesDialog {
 
 		Button addbtn = new Button(shell, SWT.PUSH);
 		addbtn.setText("Add");
-		addbtn.addSelectionListener(widgetSelectedAdapter(e -> new AddPriceDialog(display).run()));
+		addbtn.addSelectionListener(widgetSelectedAdapter(e -> new AddDialog(display, mesaj).run()));
 
 		Button sortbtn = new Button(shell, SWT.PUSH);
 		sortbtn.setText("Sort");
-		sortbtn.addSelectionListener(widgetSelectedAdapter(e -> new SortPricesDialog(display).open()));
+		sortbtn.addSelectionListener(widgetSelectedAdapter(e -> new SortDialog(display, mesaj).open()));
 		sortbtn.addSelectionListener(widgetSelectedAdapter(e -> shell.close()));
 
 		Button delbtn = new Button(shell, SWT.PUSH);
 		delbtn.setText("Delete");
-		delbtn.addSelectionListener(widgetSelectedAdapter(e -> new DeletePriceDialog(display).run()));
+		delbtn.addSelectionListener(widgetSelectedAdapter(e -> System.out.println("Delete")));
 
 		Button refreshbtn = new Button(shell, SWT.PUSH);
 		refreshbtn.setText("Refresh");
-		refreshbtn.addSelectionListener(widgetSelectedAdapter(e -> new PricesDialog(display).run()));
+		refreshbtn.addSelectionListener(widgetSelectedAdapter(e -> new SortDialog(display, mesaj).open()));
 		refreshbtn.addSelectionListener(widgetSelectedAdapter(e -> shell.close()));
 
 		shell.pack();

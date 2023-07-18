@@ -23,6 +23,39 @@ public class DatabaseFunctions {
 
 	}
 
+	public List<Article> getSortedArticles() {
+
+		return new WithSessionAndTransaction<List<Article>>() {
+			@Override
+			public void doAction(Session session) {
+
+				Query<Article> result = session.createQuery("from Article order by name", Article.class);
+
+				setReturnValue(result.list());
+
+			}
+		}.run();
+
+	}
+
+	public void removeArticle(String name) {
+
+		new WithSessionAndTransaction() {
+			@Override
+			public void doAction(Session session) {
+
+				Article a = getArticleByName(name, session);
+				if (a == null) {
+					throw new RuntimeException("Articol inexistent: " + name);
+				}
+
+				session.delete(a);
+
+			}
+		}.run();
+
+	}
+
 	public void saveStore(String name) {
 
 		new WithSessionAndTransaction() {
@@ -31,6 +64,37 @@ public class DatabaseFunctions {
 
 				Store s = new Store(name);
 				session.save(s);
+
+			}
+		}.run();
+
+	}
+
+	public List<Store> getSortedStores() {
+
+		return new WithSessionAndTransaction<List<Store>>() {
+			@Override
+			public void doAction(Session session) {
+
+				Query<Store> result = session.createQuery("from Store order by name", Store.class);
+				setReturnValue(result.list());
+			}
+		}.run();
+
+	}
+
+	public void removeStore(String name) {
+
+		new WithSessionAndTransaction() {
+			@Override
+			public void doAction(Session session) {
+
+				Store s = getStoreByName(name, session);
+				if (s == null) {
+					throw new RuntimeException("Magazin inexistent: " + name);
+				}
+
+				session.delete(s);
 
 			}
 		}.run();
@@ -58,6 +122,54 @@ public class DatabaseFunctions {
 
 			}
 
+		}.run();
+
+	}
+
+	public List<Price> getSortedPrices() {
+
+		return new WithSessionAndTransaction<List<Price>>() {
+			@Override
+			public void doAction(Session session) {
+
+				Query<Price> result = session.createQuery("from Price order by price", Price.class);
+
+				setReturnValue(result.list());
+
+			}
+		}.run();
+
+	}
+
+	public void removePrice(String nameA, String nameS) {
+
+		new WithSessionAndTransaction() {
+			@Override
+			public void doAction(Session session) {
+
+				Article article = getArticleByName(nameA, session);
+				if (article == null) {
+					throw new RuntimeException("Articol inexistent: " + nameA);
+				}
+
+				Store store = getStoreByName(nameS, session);
+				if (store == null) {
+					throw new RuntimeException("Magazin inexistent: " + nameS);
+				}
+
+				Query<Price> query = session.createQuery("from Price where article_id = :idA and store_id =: idS",
+						Price.class);
+				query.setParameter("idA", article.getId());
+				query.setParameter("idS", store.getId());
+
+				Price pricee = query.uniqueResult();
+				if (pricee == null) {
+					throw new RuntimeException("Articolul " + nameA + "nu exista in " + nameS);
+				}
+
+				session.delete(pricee);
+
+			}
 		}.run();
 
 	}
