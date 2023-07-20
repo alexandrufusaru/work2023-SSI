@@ -83,7 +83,7 @@ public class SortDialog {
 
 		Button delbtn = new Button(shell, SWT.PUSH);
 		delbtn.setText("Delete");
-		delbtn.addSelectionListener(widgetSelectedAdapter(e -> System.out.println("Delete")));
+		delbtn.addSelectionListener(widgetSelectedAdapter(e -> new DeleteDialog(display, mesaj).run()));
 
 		Button refreshbtn = new Button(shell, SWT.PUSH);
 		refreshbtn.setText("Refresh");
